@@ -43,6 +43,10 @@ function Layout() {
   )
 }
 
+// NOTE: When deploying to GitHub Pages under a repository (project page)
+// the app is served under a subpath (e.g. '/pagina-de-tiempos/').
+// We must set the router basename to the same subpath so route matching
+// works correctly when the app is loaded from that subpath.
 const router = createBrowserRouter(
   [
     {
@@ -55,8 +59,8 @@ const router = createBrowserRouter(
       ],
     },
   ],
-  // Opt into the v7 relative splat path behavior to silence the deprecation warning
-  { future: { v7_relativeSplatPath: true } },
+  // Opt into the v7 relative splat path behavior and set basename for GH Pages
+  { future: { v7_relativeSplatPath: true }, basename: '/pagina-de-tiempos' },
 )
 
 function App() {
