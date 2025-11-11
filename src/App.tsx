@@ -43,10 +43,6 @@ function Layout() {
   )
 }
 
-// NOTE: When deploying to GitHub Pages under a repository (project page)
-// the app is served under a subpath (e.g. '/pagina-de-tiempos/').
-// We must set the router basename to the same subpath so route matching
-// works correctly when the app is loaded from that subpath.
 const router = createBrowserRouter(
   [
     {

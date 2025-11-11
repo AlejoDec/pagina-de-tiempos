@@ -13,6 +13,62 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Times table responsive styles */
+.times-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  max-height: 600px;
+  overflow: auto;
+  border: 1px solid #eee;
+  padding: 8px;
+  background: rgba(255,255,255,0.02);
+}
+.times-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.times-table th,
+.times-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+/* Position column styling */
+.times-table th.pos,
+.times-table td.pos {
+  width: 56px;
+  text-align: center;
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .times-table thead {
+    display: none;
+  }
+  .times-table, .times-table tbody, .times-table tr, .times-table td {
+    display: block;
+    width: 100%;
+  }
+  .times-table tr {
+    margin-bottom: 12px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+  }
+  .times-table td {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px;
+  }
+  .times-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    margin-right: 8px;
+    color: inherit;
+  }
+}
+
+
 a {
   font-weight: 500;
   color: #646cff;

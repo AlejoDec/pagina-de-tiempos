@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { db, collection, query, orderBy, getDocs } from '../firebase'
 import { formatMsToDisplay, parseTimeStringToMs } from '../utils/time'
+import VideosGrid from '../components/VideosGrid'
 
 type TimeItem = {
   id: string
@@ -15,6 +16,9 @@ type TimeItem = {
 const TimesList: React.FC = () => {
   const [times, setTimes] = useState<TimeItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [nombreFilter, setNombreFilter] = useState('')
+  const [carroFilter, setCarroFilter] = useState('')
+  const [tramoFilter, setTramoFilter] = useState('')
 
   useEffect(() => {
     async function load() {
@@ -53,35 +57,89 @@ const TimesList: React.FC = () => {
     return ''
   }
 
+  const getMsValue = (t: TimeItem) => {
+    if (typeof t.tiempoMs === 'number') return t.tiempoMs
+    if (t.tiempo) {
+      const parsed = parseTimeStringToMs(t.tiempo)
+      if (parsed != null) return parsed
+    }
+    return Number.POSITIVE_INFINITY
+  }
+
+  // Apply filters (case-insensitive contains) and sort by time ascending
+  const filtered = times
+    .filter((t) => {
+      const nombreOk = nombreFilter.trim() === '' || t.nombre.toLowerCase().includes(nombreFilter.trim().toLowerCase())
+      const carroOk = carroFilter.trim() === '' || t.carro.toLowerCase().includes(carroFilter.trim().toLowerCase())
+      const tramoOk = tramoFilter.trim() === '' || t.tramo.toLowerCase().includes(tramoFilter.trim().toLowerCase())
+      return nombreOk && carroOk && tramoOk
+    })
+    .sort((a, b) => getMsValue(a) - getMsValue(b))
+
   return (
     <div style={{ padding: 12 }}>
       <h2>Tiempos de la pista - Medellín</h2>
       {loading ? (
         <p>Cargando...</p>
       ) : (
-        <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-          <thead>
-            <tr>
-              <th style={{ border: '1px solid #ddd', padding: 8 }}>Tramo</th>
-              <th style={{ border: '1px solid #ddd', padding: 8 }}>Carro</th>
-              <th style={{ border: '1px solid #ddd', padding: 8 }}>Nombre conductor</th>
-              <th style={{ border: '1px solid #ddd', padding: 8 }}>Tiempo</th>
-              <th style={{ border: '1px solid #ddd', padding: 8 }}>Nota</th>
-            </tr>
-          </thead>
-          <tbody>
-            {times.map((t) => (
-              <tr key={t.id}>
-                <td style={{ border: '1px solid #eee', padding: 8 }}>{t.tramo}</td>
-                <td style={{ border: '1px solid #eee', padding: 8 }}>{t.carro}</td>
-                <td style={{ border: '1px solid #eee', padding: 8 }}>{t.nombre}</td>
-                <td style={{ border: '1px solid #eee', padding: 8 }}>{displayTime(t)}</td>
-                <td style={{ border: '1px solid #eee', padding: 8 }}>{t.nota || ''}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+            <input
+              placeholder="Filtrar por nombre"
+              value={nombreFilter}
+              onChange={(e) => setNombreFilter(e.target.value)}
+              style={{ padding: 6 }}
+            />
+            <input
+              placeholder="Filtrar por carro"
+              value={carroFilter}
+              onChange={(e) => setCarroFilter(e.target.value)}
+              style={{ padding: 6 }}
+            />
+            <input
+              placeholder="Filtrar por tramo"
+              value={tramoFilter}
+              onChange={(e) => setTramoFilter(e.target.value)}
+              style={{ padding: 6 }}
+            />
+          </div>
+
+          <div className="times-container">
+            <table className="times-table">
+              <thead>
+                <tr>
+                  <th className="pos">Pos</th>
+                  <th>Tramo</th>
+                  <th>Carro</th>
+                  <th>Nombre conductor</th>
+                  <th>Tiempo</th>
+                  <th>Nota</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((t, idx) => {
+                  const pos = idx + 1
+                  const medal = pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : String(pos)
+                  return (
+                    <tr key={t.id}>
+                      <td className="pos" data-label="Pos">
+                        {medal}
+                      </td>
+                      <td data-label="Tramo">{t.tramo}</td>
+                      <td data-label="Carro">{t.carro}</td>
+                      <td data-label="Nombre">{t.nombre}</td>
+                      <td data-label="Tiempo">{displayTime(t)}</td>
+                      <td data-label="Nota">{t.nota || ''}</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
+      {/* Videos section below the table */}
+      <VideosGrid />
     </div>
   )
 }
