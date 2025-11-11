@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+  "postbuild": "node scripts/create-404.cjs",
+    "predeploy": "pnpm run build",
+    "deploy": "gh-pages -d dist",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -16,6 +19,7 @@
     "firebase": "^10.11.0"
   },
   "devDependencies": {
+    "gh-pages": "^5.0.0",
     "@eslint/js": "^9.39.1",
     "@types/node": "^24.10.0",
     "@types/react": "^19.2.2",
